@@ -13,6 +13,7 @@ import 'history_screen.dart';
 
 
 
+
 void main() {
   runApp(
     MultiProvider(
@@ -693,6 +694,8 @@ class OperationsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<AppLanguage>().lang;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
       decoration: BoxDecoration(
@@ -704,10 +707,10 @@ class OperationsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Последние операции',
-                  style: TextStyle(
+                  AppTexts.get(lang, 'last_operations'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF18214D),
@@ -715,19 +718,26 @@ class OperationsCard extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
-                child: const Row(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const HistoryScreen(),
+                    ),
+                  );
+                },
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Все операции',
-                      style: TextStyle(
+                      AppTexts.get(lang, 'all_operations'),
+                      style: const TextStyle(
                         color: Color(0xFF5C6CFF),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
+                    const SizedBox(width: 4),
+                    const Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 14,
                       color: Color(0xFF5C6CFF),
@@ -738,38 +748,54 @@ class OperationsCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          const OperationItem(
-            icon: Icons.account_balance_wallet_outlined,
-            iconBg: Color(0xFFE8F7EE),
-            iconColor: Color(0xFF20B26B),
-            title: 'Зарплата',
-            subtitle: 'Поступление',
-            amount: '+50 000 сом',
-            amountColor: Color(0xFF20B26B),
-            date: 'Сегодня',
+
+          OperationItem(
+            icon: Icons.savings_outlined,
+            iconBg: const Color(0xFFE8F7EE),
+            iconColor: const Color(0xFF20B26B),
+            title: 'Пополнение накоплений',
+            subtitle: 'Перевод на цель',
+            amount: '+5 000 сом',
+            amountColor: const Color(0xFF20B26B),
+            date: AppTexts.get(lang, 'today'),
           ),
           const Divider(height: 22, color: Color(0xFFF0F1F7)),
-          const OperationItem(
+
+          OperationItem(
             icon: Icons.shopping_bag_outlined,
-            iconBg: Color(0xFFFFEEF1),
-            iconColor: Color(0xFFFF4D6D),
-            title: 'Супермаркет',
-            subtitle: 'Продукты',
+            iconBg: const Color(0xFFFFEEF1),
+            iconColor: const Color(0xFFFF4D6D),
+            title: 'Покупка',
+            subtitle: AppTexts.get(lang, 'supermarket'),
             amount: '-2 450 сом',
-            amountColor: Color(0xFF18214D),
-            date: 'Вчера',
+            amountColor: const Color(0xFF18214D),
+            date: AppTexts.get(lang, 'yesterday'),
           ),
           const Divider(height: 22, color: Color(0xFFF0F1F7)),
-          const OperationItem(
-            icon: Icons.local_cafe_outlined,
-            iconBg: Color(0xFFFFEEF1),
-            iconColor: Color(0xFFFF4D6D),
-            title: 'Кофейня',
-            subtitle: 'Кафе и рестораны',
-            amount: '-350 сом',
-            amountColor: Color(0xFF18214D),
-            date: 'Вчера',
+
+          OperationItem(
+            icon: Icons.account_balance_wallet_outlined,
+            iconBg: const Color(0xFFE8F7EE),
+            iconColor: const Color(0xFF20B26B),
+            title: AppTexts.get(lang, 'salary'),
+            subtitle: AppTexts.get(lang, 'income_arrival'),
+            amount: '+50 000 сом',
+            amountColor: const Color(0xFF20B26B),
+            date: '12 апр',
           ),
+          const Divider(height: 22, color: Color(0xFFF0F1F7)),
+
+          OperationItem(
+            icon: Icons.local_cafe_outlined,
+            iconBg: const Color(0xFFFFEEF1),
+            iconColor: const Color(0xFFFF4D6D),
+            title: AppTexts.get(lang, 'coffee_shop'),
+            subtitle: AppTexts.get(lang, 'cafes_restaurants'),
+            amount: '-350 сом',
+            amountColor: const Color(0xFF18214D),
+            date: '11 апр',
+          ),
+
           const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

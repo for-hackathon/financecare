@@ -242,6 +242,15 @@ class AppTexts {
       'create_financial_plan': 'Жеке каржылык план түзүү',
       'history': 'История',
       'history': 'Тарых',
+      'last_operations': 'Последние операции',
+       'all_operations': 'Все операции',
+       'today': 'Сегодня',
+       'yesterday': 'Вчера',
+        'salary': 'Зарплата',
+       'income_arrival': 'Поступление',
+       'supermarket': 'Супермаркет',
+       'coffee_shop': 'Кофейня',
+       'cafes_restaurants': 'Кафе и рестораны',
     },
   };
 
