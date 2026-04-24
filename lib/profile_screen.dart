@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'main.dart';
 import 'edit_profile_screen.dart';
 import 'app_language.dart';
 import 'app_texts.dart';
+import 'auth_state.dart';
+import 'auth_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,6 +20,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String name = 'Zhyldyz';
   String email = 'example@gmail.com';
   String phone = '+996 500 00 00 00';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      name = prefs.getString('name') ?? name;
+      email = prefs.getString('email') ?? email;
+      phone = prefs.getString('phone') ?? phone;
+    });
+  }
+
+  Future<void> _editProfile() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditProfileScreen(
+          name: name,
+          email: email,
+          phone: phone,
+        ),
+      ),
+    );
+
+    if (result != null && result is Map<String, String>) {
+      final newName = result['name'] ?? name;
+      final newEmail = result['email'] ?? email;
+      final newPhone = result['phone'] ?? phone;
+
+      await context.read<AuthState>().updateProfile(
+            name: newName,
+            email: newEmail,
+            phone: newPhone,
+          );
+
+      setState(() {
+        name = newName;
+        email = newEmail;
+        phone = newPhone;
+      });
+    }
+  }
+
+  Future<void> _logout() async {
+    await context.read<AuthState>().logout();
+
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0xFF18214D),
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     Container(
@@ -94,7 +158,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _editProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF18214D),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          AppTexts.get(lang, 'edit_profile'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
 
                     ProfileSectionTitle(
                       title: AppTexts.get(lang, 'personal_info'),
@@ -123,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     ProfileSectionTitle(
                       title: AppTexts.get(lang, 'my_finances'),
@@ -152,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     ProfileSectionTitle(
                       title: AppTexts.get(lang, 'settings'),
@@ -175,7 +264,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     ProfileSectionTitle(
                       title: AppTexts.get(lang, 'language'),
@@ -185,86 +274,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
+                          child: _LanguageButton(
+                            text: AppTexts.get(lang, 'ru'),
+                            active: lang == 'ru',
+                            onTap: () {
                               context.read<AppLanguage>().changeLang('ru');
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: lang == 'ru'
-                                  ? const Color(0xFF5C4FFF)
-                                  : Colors.white,
-                              foregroundColor: lang == 'ru'
-                                  ? Colors.white
-                                  : const Color(0xFF18214D),
-                              elevation: 0,
-                              side: const BorderSide(color: Color(0xFFF0F1F7)),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            child: Text(
-                              AppTexts.get(lang, 'ru'),
-                              style: const TextStyle(fontWeight: FontWeight.w700),
-                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
+                          child: _LanguageButton(
+                            text: AppTexts.get(lang, 'kg'),
+                            active: lang == 'kg',
+                            onTap: () {
                               context.read<AppLanguage>().changeLang('kg');
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: lang == 'kg'
-                                  ? const Color(0xFF5C4FFF)
-                                  : Colors.white,
-                              foregroundColor: lang == 'kg'
-                                  ? Colors.white
-                                  : const Color(0xFF18214D),
-                              elevation: 0,
-                              side: const BorderSide(color: Color(0xFFF0F1F7)),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            child: Text(
-                              AppTexts.get(lang, 'kg'),
-                              style: const TextStyle(fontWeight: FontWeight.w700),
-                            ),
                           ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 28),
 
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditProfileScreen(
-                                name: name,
-                                email: email,
-                                phone: phone,
-                              ),
-                            ),
-                          );
-
-                          if (result != null && result is Map<String, String>) {
-                            setState(() {
-                              name = result['name'] ?? name;
-                              email = result['email'] ?? email;
-                              phone = result['phone'] ?? phone;
-                            });
-                          }
-                        },
+                        onPressed: _logout,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF18214D),
+                          backgroundColor: const Color(0xFFFF4D6D),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
@@ -272,9 +310,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
-                          AppTexts.get(lang, 'edit_profile'),
-                          style: const TextStyle(
+                        child: const Text(
+                          'Выйти',
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
@@ -285,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            SharedBottomNav(current: SharedTab.profile),
+            const SharedBottomNav(current: SharedTab.profile),
           ],
         ),
       ),
@@ -386,6 +424,39 @@ class ProfileRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LanguageButton extends StatelessWidget {
+  final String text;
+  final bool active;
+  final VoidCallback onTap;
+
+  const _LanguageButton({
+    required this.text,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: active ? const Color(0xFF5C4FFF) : Colors.white,
+        foregroundColor: active ? Colors.white : const Color(0xFF18214D),
+        elevation: 0,
+        side: const BorderSide(color: Color(0xFFF0F1F7)),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w700),
+      ),
     );
   }
 }

@@ -10,6 +10,8 @@ import 'bank_select_screen.dart';
 import 'goal_state.dart';
 import 'goal_setup_screen.dart';
 import 'history_screen.dart';
+import 'auth_screen.dart';
+import 'auth_state.dart';
 
 
 
@@ -21,6 +23,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AppLanguage()),
         ChangeNotifierProvider(create: (_) => BankState()),
         ChangeNotifierProvider(create: (_) => GoalState()),
+        ChangeNotifierProvider(create: (_) => AuthState()..checkAuth()),
       ],
       child: const FinanceCareApp(),
     ),
@@ -997,7 +1000,9 @@ class SharedBottomNav extends StatelessWidget {
               icon: Icons.person_outline_rounded,
               label: AppTexts.get(lang, 'profile'),
               active: current == SharedTab.profile,
-              page: const ProfileScreen(),
+              page: context.watch<AuthState>().isLoggedIn
+              ? const ProfileScreen()
+              : const AuthScreen(),
             ),
           ],
         ),
